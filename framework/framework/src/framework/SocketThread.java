@@ -16,10 +16,10 @@ package framework;
     }
     @Override
     public void run(){
-        String [] split;
-        int code;
-        String n;
-        String m;
+//        String [] split;
+//        int code;
+//        String n;
+//        String m;
             while (continua) {
                 tmp=null;
                 espera(); 

@@ -49,9 +49,11 @@ public class Sender extends Entidade{
         // inicializacao dos estados
         _idle = new Sender_idle(this);
         _sending = new Sender_sending(this);       
+
         // definicao do estado inicial
         g.defEstado("IDLE");
         mudaEstado(_idle);
+
         // Inicia thread de leitura do socket
         xthread = new meio.SocketThread(msg,this);
         thread2 = new Thread(xthread);
@@ -59,7 +61,9 @@ public class Sender extends Entidade{
     }
     
     public static void main(String args[]) {
-        Sender s = new Sender(7001,7000); // porta local, porta do meio
+        Sender s = new Sender(7001,7000);
+        Sender s1 = new Sender(7002,7000);
+        Sender s2 = new Sender(7003,7000); // porta local, porta do meio
         s.g.EscreveLog("Timeout 10 segundos");
         s.g.EscreveLog("Entidade de protocolo inicializada");
         //System.out.println("Entidade SENDER inicializada");
