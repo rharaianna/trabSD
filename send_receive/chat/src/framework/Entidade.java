@@ -16,11 +16,13 @@ public class Entidade {
    public Thread thread1;
    
    public void defPortaLocal(int p){
-        msg =new Msg();
-        msg.lPort=p;
+       if (msg != null) {
+           msg.lPort = p;
+       }
    }
    
    public Entidade(){
+       msg = new Msg();
        buffer = new ArrayDeque<>();
        // inicia thread de tratamento de eventos
        ethread = new EventoThread(this);

@@ -10,7 +10,7 @@ package Code;
 import framework.Entidade;
 import framework.Evento;
 import meio.Meio;
-import sender.Sender;
+import user.User;
 
 /**
  *
@@ -53,6 +53,12 @@ public class Gui extends javax.swing.JFrame {
             jButton2.setEnabled(!jButton2.isEnabled());
     }
 
+    public void desabilitaBotoesConexao(){
+        btnConvidar.setEnabled(false);
+        btnAceitar.setEnabled(false);
+        btnRejeitar.setEnabled(false);
+    }
+
    
     /**
      * This method is called from within the constructor to initialize the form.
@@ -63,6 +69,9 @@ public class Gui extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btnConvidar = new javax.swing.JButton("Convidar");
+        btnAceitar = new javax.swing.JButton("Aceitar");
+        btnRejeitar = new javax.swing.JButton("Rejeitar");
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
@@ -79,6 +88,32 @@ public class Gui extends javax.swing.JFrame {
         jTextField3 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        btnConvidar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConvidarActionPerformed(evt);
+            }
+        });
+
+        btnAceitar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAceitarActionPerformed(evt);
+            }
+        });
+
+        btnRejeitar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRejeitarActionPerformed(evt);
+            }
+        });
+
+        btnConvidar.setBounds(320, 25, 90, 25);
+        btnAceitar.setBounds(220, 85, 90, 25);
+        btnRejeitar.setBounds(320, 85, 90, 25);
+
+        getContentPane().add(btnConvidar);
+        getContentPane().add(btnAceitar);
+        getContentPane().add(btnRejeitar);
 
         jLabel1.setText("Entidade de Protocolo:");
 
@@ -194,9 +229,9 @@ public class Gui extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         // gera evento MSG
-        ((Sender)ent).ms = jTextField1.getText();
+        ((User)ent).ms = jTextField1.getText();
         trocaEnvio();
-        ent.colocaEvento(new Evento(Meio.MSG,"msg",((Sender)ent).ms,null));  
+        ent.colocaEvento(new Evento(Meio.MSG,"msg",((User)ent).ms,null));
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -204,10 +239,24 @@ public class Gui extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void btnConvidarActionPerformed(java.awt.event.ActionEvent evt) {
+        ent.colocaEvento(new Evento(Meio.CONVITE, "convite", "User1", null));
+    }
+
+    private void btnAceitarActionPerformed(java.awt.event.ActionEvent evt) {
+        ent.colocaEvento(new Evento(Meio.ACEITAR, "aceitar", "ok", null));
+    }
+
+    private void btnRejeitarActionPerformed(java.awt.event.ActionEvent evt) {
+        ent.colocaEvento(new Evento(Meio.REJEITAR, "rejeitar", "no", null));
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton btnConvidar;
+    private javax.swing.JButton btnAceitar;
+    private javax.swing.JButton btnRejeitar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
