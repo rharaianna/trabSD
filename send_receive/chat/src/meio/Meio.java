@@ -43,7 +43,7 @@ public class Meio extends Entidade{
         super();
         // cria interface
         gui = new Gui(this);
-        gui.desabilitaBotoesConexao();
+        gui.modoMeio();
 
         // inicializacao dos estados
         _idle = new Meio_idle(this);

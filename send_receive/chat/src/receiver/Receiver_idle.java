@@ -21,7 +21,7 @@ public class Receiver_idle extends Estado{
                 ((Receiver)ent).ms = _ev.C2;
                 // Evento de saida RECEBE
                     // entrega msg para o USUARIO
-                    ((Receiver)ent).g.EscreveUi("> "+_ev.C2);
+                    //((Receiver)ent).g.EscreveUi("> "+_ev.C2);
                 // System.out.print("Mensagem: "+_ev.C2+"\n");
                 // Evento de saida RESPONDE (entrega ack para o MEIO)
                     Evento e = new Evento(Meio.RESPONDE,"responde","ack",null);

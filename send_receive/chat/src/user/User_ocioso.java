@@ -34,6 +34,7 @@ public class User_ocioso extends Estado {
 
     @Override
     public void acao() {
-        ((User) ent).gui.trocaEnvio();
+        ((User) ent).gui.modoOcioso();
+        ((User) ent).gui.defEstado("OCIOSO");
     }
 }

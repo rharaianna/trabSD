@@ -72,8 +72,8 @@ public class Sender extends Entidade{
     public String le(){
         String aux;
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in)); 
-        g.EscreveUi("Informe a menssagem!");
-        g.trocaEnvio();
+        //g.EscreveUi("Informe a menssagem!");
+        //g.trocaEnvio();
         //System.out.print("Informe a menssagem: ");
         
         try {

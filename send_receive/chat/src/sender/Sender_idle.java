@@ -28,7 +28,7 @@ public class Sender_idle extends Estado{
     }
     @Override
     public void acao(){
-        ((Sender)ent).g.trocaEnvio();
+        //((Sender)ent).g.trocaEnvio();
         // Le dado do usuário 
         //((Sender)ent).ms = ((Sender)ent).le();
         // gera evento MSG

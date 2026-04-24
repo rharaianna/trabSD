@@ -16,6 +16,7 @@ public class User_aguarda_conexao extends Estado {
 
     @Override
     public void acao() {
-        super.acao();
+        ((User) ent).gui.modoAguardando();
+        ((User) ent).gui.defEstado("AGUARDA CONEXÃO");
     }
 }
