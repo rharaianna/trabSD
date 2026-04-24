@@ -12,11 +12,13 @@ import framework.Estado;
  * @author Ciro
  */
 public class Meio extends Entidade{
- public String ms;  
-    // informacoes especificas do protocolo
-    public int portaUsuario1;
-    public int portaUsuario2;
+    public String ms;
     public Gui gui;
+
+    // informacoes especificas do protocolo
+    public int portaConvidante = -1;
+    public int portaConvidado  = -1;
+
     // definicao dos codigos das PDUs
     public static final int MSG  = 1;
     public static final int ENVIA  = 2;
@@ -29,7 +31,7 @@ public class Meio extends Entidade{
     public static final int ACEITAR = 10;
     public static final int REJEITAR = 11;
     public static final int OCUPADO = 12;
-    public static final int DESCONECTAR = 12;
+    public static final int DESCONECTAR = 13;
 
     // estados desse protocolo
     public Estado _idle;
@@ -37,14 +39,11 @@ public class Meio extends Entidade{
     framework.SocketThread xthread; 
     Thread thread2;
    
-    public Meio(int _portaLocal, int _portaUsuario1, int _portaUsuario2){
+    public Meio(int _portaLocal){
         super();
         // cria interface
         gui = new Gui(this);
         gui.desabilitaBotoesConexao();
-        // inicializa informacoes do protocolo
-        portaUsuario1= _portaUsuario1;
-        portaUsuario2 = _portaUsuario2;
 
         // inicializacao dos estados
         _idle = new Meio_idle(this);
@@ -63,7 +62,7 @@ public class Meio extends Entidade{
     }
     
     public static void main(String args[]) {
-        Meio meio = new Meio(7000,7001,7002);
+        Meio meio = new Meio(7000);
         meio.gui.EscreveLog("Entidade de protocolo inicializada");
     }
       

@@ -240,7 +240,9 @@ public class Gui extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void btnConvidarActionPerformed(java.awt.event.ActionEvent evt) {
-        ent.colocaEvento(new Evento(Meio.CONVITE, "convite", "User1", null));
+        String portaDestino = jTextField1.getText();
+        String portaLocal = String.valueOf(((User)ent).portaLocal); // porta real do User
+        ent.colocaEvento(new Evento(Meio.CONVITE, portaLocal, portaDestino, null));
     }
 
     private void btnAceitarActionPerformed(java.awt.event.ActionEvent evt) {

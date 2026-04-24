@@ -12,11 +12,12 @@ public class User_ocioso extends Estado {
 
     @Override
     public void transicao(Evento _evento) {
+        User p = (User) ent;
 
         switch (_evento.code) {
             case Meio.CONVITE:
                 // Lógica: Mostra na GUI botões de Aceitar/Recusar
-                ((User) ent).gui.EscreveLog("Recebeu convite de: " + _evento.C2);
+                p.gui.EscreveLog("Recebeu convite de: " + _evento.C2);
                 break;
 
             case Meio.ACEITAR:

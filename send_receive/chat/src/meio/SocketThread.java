@@ -23,8 +23,12 @@ public class SocketThread extends framework.SocketThread {
                     code= Integer.valueOf(split[0]);
                     n=split[1];
                     m=split[2];
-                   // Cria Evento
-                    Evento e = new Evento(code, n, m,null);
+
+                    // captura porta de quem enviou
+                    String portaOrigem = String.valueOf(ms.ss.getPort());
+                   // Cria Evento EX: (CONVITE, "userA", porta do destino, portaDeA)
+
+                    Evento e = new Evento(code, n, m, portaOrigem);
                    // Coloca no buffer da entidade
                    ent.colocaEvento(e); 
     }

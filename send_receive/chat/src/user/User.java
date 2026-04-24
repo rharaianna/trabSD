@@ -2,12 +2,15 @@ package user;
 
 import Code.Gui;
 import framework.Entidade;
+import framework.Evento;
 import framework.Timeout;
+import meio.Meio;
 
 
 public class User extends Entidade{
     public String ms;
     public int m;
+    public int portaLocal;
     public Gui gui;
 
     User_ocioso _ocioso;
@@ -24,6 +27,10 @@ public class User extends Entidade{
 
     public User(int _portaLocal, int _portaMeio){
         super();
+
+        //Define porta no socket
+        this.portaLocal = _portaLocal;
+        this.defPortaLocal(_portaLocal);
         // cria interface
         gui = new Gui(this);
 
@@ -51,8 +58,27 @@ public class User extends Entidade{
         gui.EscreveLog("Entidade de protocolo inicializada");
     }
 
+    // chama isso para enviar convite para outro user
+    public void convida(int portaDestino){
+        Evento e = new Evento(Meio.CONVITE, String.valueOf(portaLocal), String.valueOf(portaDestino), null);
+        msg.conecta("localhost", m);
+        msg.envia(e.toString());
+        msg.termina();
+        gui.EscreveLog("Convite enviado para porta " + portaDestino);
+    }
+
     public static void main(String args[]) {
-        User user1 = new User(7001,7000); // porta local, porta do meio
-        User user2 = new User(7002,7000); // porta local, porta do meio
+        User user1 = new User(7001, 7000);
+        User user2 = new User(7002, 7000);
+        User user3 = new User(7003, 7000);
+
+        // aguarda inicializacao
+        try {
+            Thread.sleep(1000);
+        } catch (Exception e) {
+        }
+
+        // teste: user1 convida user2
+        user1.convida(7002);
     }
 }
