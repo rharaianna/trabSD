@@ -11,10 +11,12 @@ public class User extends Entidade{
     public String ms;
     public int m;
     public int portaLocal;
+    public int portaConvidante = -1; // guarda quem me convidou
     public Gui gui;
 
     User_ocioso _ocioso;
     User_aguarda_conexao _aguarda_conexao;
+    User_recebe_pedido _recebe_pedido;
     User_conectado _conectado;
 
     Timeout t1;
@@ -42,6 +44,7 @@ public class User extends Entidade{
         // inicializacao dos estados
         _ocioso = new User_ocioso(this);;
         _aguarda_conexao = new User_aguarda_conexao(this);
+        _recebe_pedido   = new User_recebe_pedido(this);
         _conectado = new User_conectado(this);
 
         // definicao do estado inicial
@@ -58,27 +61,11 @@ public class User extends Entidade{
         gui.EscreveLog("Entidade de protocolo inicializada");
     }
 
-    // chama isso para enviar convite para outro user
-    public void convida(int portaDestino){
-        Evento e = new Evento(Meio.CONVITE, String.valueOf(portaLocal), String.valueOf(portaDestino), null);
-        msg.conecta("localhost", m);
-        msg.envia(e.toString());
-        msg.termina();
-        gui.EscreveLog("Convite enviado para porta " + portaDestino);
-    }
 
     public static void main(String args[]) {
         User user1 = new User(7001, 7000);
         User user2 = new User(7002, 7000);
         User user3 = new User(7003, 7000);
 
-        // aguarda inicializacao
-        try {
-            Thread.sleep(1000);
-        } catch (Exception e) {
-        }
-
-        // teste: user1 convida user2
-        user1.convida(7002);
     }
 }

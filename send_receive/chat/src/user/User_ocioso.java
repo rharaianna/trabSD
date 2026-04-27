@@ -16,18 +16,24 @@ public class User_ocioso extends Estado {
 
         switch (_evento.code) {
             case Meio.CONVITE:
+                if (_evento.C1.equals(String.valueOf(p.portaLocal))) {
+                    // evento LOCAL — fui eu que cliquei em conectar
+                    p.gui.EscreveLog("Enviando convite para: " + _evento.C2);
+                    p.msg.conecta("localhost", p.m);
+                    p.msg.envia(_evento.toString());
+                    p.msg.termina();
+                    p.mudaEstado(p._aguarda_conexao);
+                } else {
+                    // evento de REDE — recebi convite de alguém
+                    p.portaConvidante = Integer.parseInt(_evento.C2);
+                    p.gui.EscreveLog("Convite recebido de: " + _evento.C2);
+                    p.mudaEstado(p._recebe_pedido);
+                }
+                break;
+            default:
                 // Lógica: Mostra na GUI botões de Aceitar/Recusar
                 p.gui.EscreveLog("Recebeu convite de: " + _evento.C2);
                 break;
-
-            case Meio.ACEITAR:
-                // U1 recebe isso e muda para o estado CONECTADO
-                ent.mudaEstado(((User) ent)._conectado);
-                break;
-            case Meio.REJEITAR:
-                ((User) ent).gui.EscreveLog("Convite rejeitado!");
-                break;
-
         }
 
     }
