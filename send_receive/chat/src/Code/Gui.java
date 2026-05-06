@@ -24,7 +24,7 @@ public class Gui extends javax.swing.JFrame {
         txtEstado   = new javax.swing.JTextField();
         scrollLog   = new javax.swing.JScrollPane();
         txtLog      = new javax.swing.JTextArea();
-        btnSair     = new javax.swing.JButton("Sair");
+        btnSair     = new javax.swing.JButton("Desconectar");
         lblPorta    = new javax.swing.JLabel("Porta destino:");
         txtPorta    = new javax.swing.JTextField();
         btnConvidar = new javax.swing.JButton("Conectar");
@@ -61,7 +61,7 @@ public class Gui extends javax.swing.JFrame {
         txtMsg.setBounds(10, 315, 270, 25);
         btnEnviar.setBounds(290, 315, 105, 25);
 
-        btnSair.setBounds(160, 355, 80, 25);
+        btnSair.setBounds(150, 355, 120, 25);
 
         getContentPane().add(lblEntidade);
         getContentPane().add(txtEntidade);
@@ -77,7 +77,15 @@ public class Gui extends javax.swing.JFrame {
         getContentPane().add(btnEnviar);
         getContentPane().add(btnSair);
 
-        btnSair.addActionListener(e -> System.exit(0));
+        btnSair.addActionListener(e -> {
+            User p = (User) ent;
+            // Criamos um evento de desconexão enviando nossa porta local
+            // C2 enviamos "local" para saber que fomos nós que clicamos
+            Evento ev = new Evento(Meio.DESCONECTAR, String.valueOf(p.portaLocal), "local", null);
+
+            // Dispara para a FSM processar o envio da PDU de rede
+            p.transicao(ev);
+        });
 
         btnConvidar.addActionListener(e -> {
             String portaDestino = txtPorta.getText().trim();
@@ -85,6 +93,7 @@ public class Gui extends javax.swing.JFrame {
                 String portaLocal = String.valueOf(((User) ent).portaLocal);
                 ent.colocaEvento(new Evento(Meio.CONVITE, portaLocal, portaDestino, null));
             }
+            txtPorta.setText("");
         });
 
         btnAceitar.addActionListener(e ->
@@ -98,9 +107,16 @@ public class Gui extends javax.swing.JFrame {
         btnEnviar.addActionListener(e -> {
             String texto = txtMsg.getText().trim();
             if (!texto.isEmpty()) {
-                ((User) ent).ms = texto;
+                // C1: Enviamos a PORTA LOCAL deste usuário (ex: "7001")
+                // Isso permite que o Meio identifique quem é o remetente.
+                User p = (User) ent;
+                Evento evento = new Evento(Meio.ENVIA, String.valueOf(p.portaLocal), texto, null);
+
+                // Dispara para a máquina de estados processar
+                p.transicao(evento);
+
+                // Limpa o campo de texto
                 txtMsg.setText("");
-                ent.colocaEvento(new Evento(Meio.MSG, "msg", texto, null));
             }
         });
 
@@ -126,6 +142,7 @@ public class Gui extends javax.swing.JFrame {
         btnRejeitar.setVisible(false);
         txtMsg.setVisible(false);
         btnEnviar.setVisible(false);
+        btnSair.setVisible(false);
     }
 
     public void modoAguardando() {
@@ -156,6 +173,7 @@ public class Gui extends javax.swing.JFrame {
         btnRejeitar.setVisible(false);
         txtMsg.setVisible(true);
         btnEnviar.setVisible(true);
+        btnSair.setVisible(true);
     }
 
     public void EscreveLog(String msg) {

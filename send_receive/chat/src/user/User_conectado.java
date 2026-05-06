@@ -18,8 +18,29 @@ public class User_conectado extends Estado {
                 p.gui.EscreveLog("Mensagem recebida: " + _evento.C2);
                 break;
             case Meio.DESCONECTAR:
-                p.gui.EscreveLog("Outro usuário desconectou.");
+                if ("local".equals(_evento.C2)) {
+                    // Eu cliquei no botão, então eu aviso o Meio
+                    p.msg.conecta("localhost", p.m);
+                    p.msg.envia(_evento.toString());
+                    p.msg.termina();
+                    p.gui.EscreveLog("Você saiu da conversa.");
+                } else {
+                    // Eu recebi o evento vindo do Meio, ou seja, o OUTRO saiu
+                    p.gui.EscreveLog("O outro usuário encerrou a conexão.");
+                }
                 p.mudaEstado(p._ocioso);
+                break;
+            case Meio.ENVIA:
+                // 1. Criar o evento formatado para o Meio (usando o código MSG = 1)
+                Evento paraMeio = new Evento(Meio.MSG, _evento.C1, _evento.C2, null);
+
+                // 2. Conectar no Meio (p.m que é a porta 7000) e enviar
+                p.msg.conecta("localhost", p.m);
+                p.msg.envia(paraMeio.toString());
+                p.msg.termina();
+
+                // 3. Mostrar no seu próprio log para você ver o que escreveu
+                p.gui.EscreveLog("Você: " + _evento.C2);
                 break;
             default:
                 p.gui.EscreveLog("Evento descartado em CONECTADO: " + _evento.code);
