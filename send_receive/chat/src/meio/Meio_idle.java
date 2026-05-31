@@ -1,90 +1,116 @@
 /*
- * Template:
  * Estado IDLE da entidade MEIO
+ *
+ * Usa dois mapas:
+ *   pendentes: convidado → convidante  (enquanto aguarda ACEITAR/REJEITAR)
+ *   sessoes:   porta     → parceiro    (sessão confirmada, bidirecional)
+ *
+ * Isso evita sobrescrita quando um mesmo User recebe múltiplos convites
+ * simultâneos — cada convite fica em sua própria entrada de pendentes.
  */
 package meio;
 
 import framework.Entidade;
 import framework.Estado;
 import framework.Evento;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Meio_idle extends Estado{
-    public Meio_idle (Entidade _e){
+public class Meio_idle extends Estado {
+
+    // convites aguardando decisão: porta do convidado → porta do convidante
+    private final Map<Integer,Integer> pendentes = new HashMap<>();
+    // sessões ativas confirmadas (bidirecional): porta → porta do parceiro
+    private final Map<Integer,Integer> sessoes   = new HashMap<>();
+
+    public Meio_idle(Entidade _e) {
         super(_e);
-        ((Meio)ent).gui.EscreveLog("Meio Pronto"); // tirei a chance de perda
+        ((Meio) ent).gui.EscreveLog("Meio Pronto");
     }
+
     @Override
-    public void transicao(Evento _ev){
-        Meio p =(Meio) ent;
+    public void transicao(Evento _ev) {
+        Meio p = (Meio) ent;
 
-        switch(_ev.code){
+        switch (_ev.code) {
+
             case Meio.CONVITE:
-                if (p.portaConvidante != -1) {
-                    // já tem sessão ativa — rejeita
-                    p.gui.EscreveLog("Sessão em andamento, convite rejeitado.");
-                    Evento rej = new Evento(Meio.REJEITAR, "rejeitar", "ocupado", null);
-                    ent.msg.conecta("localhost", Integer.parseInt(_ev.C1));
-                    ent.msg.envia(rej.toString());
-                    ent.msg.termina();
-                }
-                else {
-                    p.portaConvidante = Integer.parseInt(_ev.C1); // porta real do User
-                    p.portaConvidado  = Integer.parseInt(_ev.C2); // destino informado pelo user
-
-                    p.gui.EscreveLog("Convite de porta " + p.portaConvidante + " para " + p.portaConvidado);
-                    Evento fwd = new Evento(Meio.CONVITE, "convite", _ev.C1, null);
-
-                    ent.msg.conecta("localhost", p.portaConvidado);
-                    ent.msg.envia(fwd.toString());
-                    ent.msg.termina();
-                }
-
+                // Apenas encaminha — registra como pendente (não sobrescreve sessão)
+                int convidante = Integer.parseInt(_ev.C1);
+                int convidado  = Integer.parseInt(_ev.C2);
+                pendentes.put(convidado, convidante);   // convidado → quem chamou
+                p.gui.EscreveLog("Convite pendente de " + convidante + " para " + convidado);
+                Evento fwd = new Evento(Meio.CONVITE, "convite", _ev.C1, null);
+                ent.msg.conecta("localhost", convidado);
+                ent.msg.envia(fwd.toString());
+                ent.msg.termina();
                 break;
 
             case Meio.ACEITAR:
-                p.gui.EscreveLog("Aceito — notificando " + p.portaConvidante);
+                // Promove o pendente para sessão ativa
+                int aceitou    = Integer.parseInt(_ev.C1);
+                int quemChamou = pendentes.remove(aceitou);   // remove do provisório
+                if (quemChamou == 0) {
+                    p.gui.EscreveLog("ACEITAR sem pendente de " + aceitou);
+                    break;
+                }
+                sessoes.put(aceitou,    quemChamou);   // bidirecional
+                sessoes.put(quemChamou, aceitou);
+                p.gui.EscreveLog("Sessão estabelecida: " + quemChamou + " ↔ " + aceitou);
                 Evento ace = new Evento(Meio.ACEITAR, "aceitar", "ok", null);
-                ent.msg.conecta("localhost", p.portaConvidante);
+                ent.msg.conecta("localhost", quemChamou);
                 ent.msg.envia(ace.toString());
                 ent.msg.termina();
                 break;
 
             case Meio.REJEITAR:
-                p.gui.EscreveLog("Rejeitado, notificando " + p.portaConvidante);
-                Evento rej2 = new Evento(Meio.REJEITAR, "rejeitar", "no", null);
-                ent.msg.conecta("localhost", p.portaConvidante);
-                ent.msg.envia(rej2.toString());
+                // Remove o pendente e notifica o convidante
+                int rejeitou    = Integer.parseInt(_ev.C1);
+                Integer chamou  = pendentes.remove(rejeitou);
+                if (chamou == null) {
+                    p.gui.EscreveLog("REJEITAR sem pendente de " + rejeitou);
+                    break;
+                }
+                p.gui.EscreveLog("Rejeitado — notificando " + chamou);
+                Evento rej = new Evento(Meio.REJEITAR, "rejeitar", "no", null);
+                ent.msg.conecta("localhost", chamou);
+                ent.msg.envia(rej.toString());
                 ent.msg.termina();
-                p.portaConvidante = -1;
-                p.portaConvidado  = -1;
                 break;
 
             case Meio.MSG:
-                // roteia para o outro lado
-                int destino = (Integer.parseInt(_ev.C1) == p.portaConvidante)
-                        ? p.portaConvidado : p.portaConvidante;
-                p.gui.EscreveLog("Mensagem roteada para " + destino);
+                // Roteia para o parceiro da sessão ativa
+                int remetente = Integer.parseInt(_ev.C1);
+                Integer destMsg = sessoes.get(remetente);
+                if (destMsg == null) {
+                    p.gui.EscreveLog("MSG sem sessão ativa de " + remetente);
+                    break;
+                }
+                p.gui.EscreveLog("MSG: " + remetente + " → " + destMsg);
                 Evento msg = new Evento(Meio.MSG, "msg", _ev.C2, null);
-                ent.msg.conecta("localhost", destino);
+                ent.msg.conecta("localhost", destMsg);
                 ent.msg.envia(msg.toString());
                 ent.msg.termina();
                 break;
 
             case Meio.DESCONECTAR:
-                int outro = (Integer.parseInt(_ev.C1) == p.portaConvidante)
-                        ? p.portaConvidado : p.portaConvidante;
-                p.gui.EscreveLog("Desconexão de " + _ev.C1 + ", notificando " + outro);
+                // Remove a sessão e notifica o parceiro
+                int quemSaiu  = Integer.parseInt(_ev.C1);
+                Integer parceiro = sessoes.remove(quemSaiu);
+                if (parceiro == null) {
+                    p.gui.EscreveLog("DESCONECTAR sem sessão de " + quemSaiu);
+                    break;
+                }
+                sessoes.remove(parceiro);
+                p.gui.EscreveLog("Desconexão: " + quemSaiu + " saiu, notificando " + parceiro);
                 Evento desc = new Evento(Meio.DESCONECTAR, "desconectar", "bye", null);
-                ent.msg.conecta("localhost", outro);
+                ent.msg.conecta("localhost", parceiro);
                 ent.msg.envia(desc.toString());
                 ent.msg.termina();
-                p.portaConvidante = -1;
-                p.portaConvidado  = -1;
                 break;
 
-            default:// evento inesperado
-                ((Meio)ent).gui.EscreveLog("MEIO descartou evento : "+_ev.code + " em IDLE");
-                //System.out.println("MEIO descartou evento : "+_ev.code + " em IDLE");
+            default:
+                p.gui.EscreveLog("MEIO descartou evento: " + _ev.code + " em IDLE");
         }
     }
 }

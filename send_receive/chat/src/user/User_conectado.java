@@ -19,17 +19,20 @@ public class User_conectado extends Estado {
                 break;
             case Meio.DESCONECTAR:
                 if ("local".equals(_evento.C2)) {
-                    // Eu cliquei no botão, então eu aviso o Meio
+                    // Força o envio da sua própria porta no C1 para o Meio saber quem está saindo
+                    Evento descParaMeio = new Evento(Meio.DESCONECTAR, String.valueOf(p.portaLocal), "local", null);
                     p.msg.conecta("localhost", p.m);
-                    p.msg.envia(_evento.toString());
+                    p.msg.envia(descParaMeio.toString());
                     p.msg.termina();
                     p.gui.EscreveLog("Você saiu da conversa.");
                 } else {
-                    // Eu recebi o evento vindo do Meio, ou seja, o OUTRO saiu
                     p.gui.EscreveLog("O outro usuário encerrou a conexão.");
                 }
+                // IMPORTANTE: Limpar variáveis de estado interno para nova conexão
+                p.portaConvidante = -1;
                 p.mudaEstado(p._ocioso);
                 break;
+
             case Meio.ENVIA:
                 // 1. Criar o evento formatado para o Meio (usando o código MSG = 1)
                 Evento paraMeio = new Evento(Meio.MSG, _evento.C1, _evento.C2, null);
@@ -42,6 +45,17 @@ public class User_conectado extends Estado {
                 // 3. Mostrar no seu próprio log para você ver o que escreveu
                 p.gui.EscreveLog("Você: " + _evento.C2);
                 break;
+
+            case Meio.CONVITE:
+                p.gui.EscreveLog("Ocupado, recusando convite extra.");
+                // C1 = Minha porta (quem está rejeitando)
+                Evento convRej = new Evento(Meio.REJEITAR, String.valueOf(p.portaLocal), "ocupado", null);
+                p.msg.conecta("localhost", p.m);
+                p.msg.envia(convRej.toString());
+                p.msg.termina();
+                // permanece no estado atual
+                break;
+
             default:
                 p.gui.EscreveLog("Evento descartado em CONECTADO: " + _evento.code);
         }

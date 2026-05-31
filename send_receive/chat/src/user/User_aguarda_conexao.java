@@ -23,13 +23,15 @@ public class User_aguarda_conexao extends Estado {
                 p.mudaEstado(p._ocioso);
                 break;
             case Meio.CONVITE:
-                // chegou convite de outro user enquanto aguarda — rejeita automaticamente
-                p.gui.EscreveLog("Ocupado, convite ignorado de: " + _evento.C2);
-                Evento rej = new Evento(Meio.REJEITAR, String.valueOf(p.portaLocal), _evento.C2, null);
+                p.gui.EscreveLog("Ocupado, recusando convite extra.");
+                // C1 = Minha porta (quem está rejeitando)
+                Evento convRej = new Evento(Meio.REJEITAR, String.valueOf(p.portaLocal), "ocupado", null);
                 p.msg.conecta("localhost", p.m);
-                p.msg.envia(rej.toString());
+                p.msg.envia(convRej.toString());
                 p.msg.termina();
+                // permanece no estado atual
                 break;
+
             default:
                 p.gui.EscreveLog("Evento descartado em AGUARDA: " + _evento.code);
         }

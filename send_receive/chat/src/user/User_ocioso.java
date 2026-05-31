@@ -25,8 +25,9 @@ public class User_ocioso extends Estado {
                     p.mudaEstado(p._aguarda_conexao);
                 } else {
                     // evento de REDE — recebi convite de alguém
+                    // Se o Meio enviou o fwd com _ev.C1, aqui ele será recebido em _evento.C2 por causa do construtor.
                     p.portaConvidante = Integer.parseInt(_evento.C2);
-                    p.gui.EscreveLog("Convite recebido de: " + _evento.C2);
+                    p.gui.EscreveLog("Convite recebido de: " + p.portaConvidante);
                     p.mudaEstado(p._recebe_pedido);
                 }
                 break;

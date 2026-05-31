@@ -15,6 +15,9 @@ public class Meio extends Entidade{
     public String ms;
     public Gui gui;
 
+    // mapa de sessões: porta -> porta do parceiro (suporta múltiplas sessões simultâneas)
+    public java.util.Map<Integer,Integer> sessoes = new java.util.HashMap<>();
+
     // informacoes especificas do protocolo
     public int portaConvidante = -1;
     public int portaConvidado  = -1;

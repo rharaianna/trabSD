@@ -33,6 +33,17 @@ public class User_recebe_pedido extends Estado {
                 p.mudaEstado(p._ocioso);
                 break;
 
+            case Meio.CONVITE:
+                p.gui.EscreveLog("Ocupado, recusando convite extra.");
+                // C1 = Minha porta (quem está rejeitando)
+                Evento convRej = new Evento(Meio.REJEITAR, String.valueOf(p.portaLocal), "ocupado", null);
+                p.msg.conecta("localhost", p.m);
+                p.msg.envia(convRej.toString());
+                p.msg.termina();
+                // permanece no estado atual
+                break;
+
+
             default:
                 p.gui.EscreveLog("Evento descartado em RECEBE_PEDIDO: " + _evento.code);
         }

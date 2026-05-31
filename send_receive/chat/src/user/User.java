@@ -66,6 +66,7 @@ public class User extends Entidade{
         User user1 = new User(7001, 7000);
         User user2 = new User(7002, 7000);
         User user3 = new User(7003, 7000);
+        User user4 = new User(7004, 7000);
 
     }
 }
